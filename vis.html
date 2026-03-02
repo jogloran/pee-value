@@ -10,28 +10,28 @@ body {
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 18px;
   line-height: 1.7;
-  color: #222;
-  background: #fff;
+  color: #ddd;
+  background: #1a1a1a;
 }
 .container { max-width: 720px; margin: 0 auto; padding: 0 24px; }
 h1 { font-size: 2.6em; line-height: 1.2; margin-bottom: 0.3em; font-weight: bold; }
-h2 { font-size: 1.7em; margin: 1.8em 0 0.5em; font-weight: bold; color: #111; }
-h3 { font-size: 1.2em; margin: 1.2em 0 0.4em; font-weight: bold; color: #333; }
+h2 { font-size: 1.7em; margin: 1.8em 0 0.5em; font-weight: bold; color: #f0f0f0; }
+h3 { font-size: 1.2em; margin: 1.2em 0 0.4em; font-weight: bold; color: #ccc; }
 p  { margin-bottom: 1em; }
-.subtitle { font-size: 1.2em; color: #555; margin-bottom: 2em; font-style: italic; }
-.hero { padding: 80px 0 50px; border-bottom: 1px solid #e8e8e8; margin-bottom: 2em; }
-.byline { font-size: 0.9em; color: #888; margin-top: 0.5em; font-family: system-ui, sans-serif; }
-hr { border: none; border-top: 1px solid #e8e8e8; margin: 2.5em 0; }
+.subtitle { font-size: 1.2em; color: #888; margin-bottom: 2em; font-style: italic; }
+.hero { padding: 80px 0 50px; border-bottom: 1px solid #333; margin-bottom: 2em; }
+.byline { font-size: 0.9em; color: #666; margin-top: 0.5em; font-family: system-ui, sans-serif; }
+hr { border: none; border-top: 1px solid #333; margin: 2.5em 0; }
 .figure {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
+  background: #222;
+  border: 1px solid #363636;
   border-radius: 6px;
   padding: 20px;
   margin: 1.5em 0;
 }
 .figure-caption {
   font-size: 0.85em;
-  color: #666;
+  color: #777;
   font-style: italic;
   margin-top: 12px;
   text-align: center;
@@ -51,12 +51,12 @@ hr { border: none; border-top: 1px solid #e8e8e8; margin: 2.5em 0; }
   align-items: center;
   gap: 8px;
 }
-.control-group label { white-space: nowrap; color: #444; min-width: 130px; }
+.control-group label { white-space: nowrap; color: #bbb; min-width: 130px; }
 .control-group input[type=range] { width: 130px; accent-color: #4C8BF5; }
 .control-group .val { min-width: 45px; color: #4C8BF5; font-weight: bold; font-variant-numeric: tabular-nums; }
-canvas { display: block; width: 100%; border-radius: 3px; }
+canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 .eq {
-  background: #f4f4f8;
+  background: #252530;
   border-left: 4px solid #4C8BF5;
   padding: 12px 18px;
   margin: 1em 0;
@@ -65,8 +65,8 @@ canvas { display: block; width: 100%; border-radius: 3px; }
   font-size: 0.95em;
   overflow-x: auto;
 }
-.eq-inline { font-family: 'Courier New', monospace; background: #f0f0f4; padding: 1px 5px; border-radius: 3px; font-size: 0.93em; }
-.note { font-size: 0.9em; color: #555; font-style: italic; }
+.eq-inline { font-family: 'Courier New', monospace; background: #252530; padding: 1px 5px; border-radius: 3px; font-size: 0.93em; }
+.note { font-size: 0.9em; color: #888; font-style: italic; }
 .btn {
   display: inline-block; padding: 7px 16px; border-radius: 4px; border: none;
   cursor: pointer; font-family: system-ui, sans-serif; font-size: 0.9em; font-weight: 600;
@@ -85,14 +85,14 @@ canvas { display: block; width: 100%; border-radius: 3px; }
   font-family: system-ui, sans-serif; font-size: 0.88em;
 }
 .stat-box {
-  background: #fff; border: 1px solid #ddd; border-radius: 4px;
+  background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 4px;
   padding: 8px 14px; text-align: center;
 }
-.stat-box .stat-label { color: #888; font-size: 0.85em; }
-.stat-box .stat-val   { font-size: 1.2em; font-weight: bold; color: #333; font-variant-numeric: tabular-nums; }
+.stat-box .stat-label { color: #777; font-size: 0.85em; }
+.stat-box .stat-val   { font-size: 1.2em; font-weight: bold; color: #ddd; font-variant-numeric: tabular-nums; }
 .gauge-wrap { display: flex; align-items: center; gap: 20px; margin-top: 14px; }
 .gauge-bar-bg {
-  flex: 1; height: 28px; background: #e8e8e8; border-radius: 14px; overflow: hidden;
+  flex: 1; height: 28px; background: #333; border-radius: 14px; overflow: hidden;
 }
 .gauge-bar {
   height: 100%; border-radius: 14px;
@@ -105,18 +105,18 @@ canvas { display: block; width: 100%; border-radius: 3px; }
   font-family: system-ui, sans-serif; font-size: 0.82em; padding: 3px 10px;
   border-radius: 12px; cursor: pointer; user-select: none;
 }
-.drink-tag.water  { background: #dceeff; color: #1a5ab8; border: 1px solid #a8c8f8; }
-.drink-tag.coffee { background: #fff0d0; color: #b07000; border: 1px solid #f0c060; }
-.drink-tag.tea    { background: #e6f7d0; color: #3a7a00; border: 1px solid #9dd060; }
+.drink-tag.water  { background: #1a2d45; color: #7aabf5; border: 1px solid #2a4870; }
+.drink-tag.coffee { background: #3a2810; color: #f0b040; border: 1px solid #664520; }
+.drink-tag.tea    { background: #1a3010; color: #7ed321; border: 1px solid #3a5e18; }
 .drink-tag .remove { margin-left: 4px; opacity: 0.5; }
 .drink-tag .remove:hover { opacity: 1; }
 .particle-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; align-items: center; }
-.ess-bar-bg { flex: 1; height: 14px; background: #e8e8e8; border-radius: 7px; overflow: hidden; min-width: 100px; }
+.ess-bar-bg { flex: 1; height: 14px; background: #333; border-radius: 7px; overflow: hidden; min-width: 100px; }
 .ess-bar    { height: 100%; background: #4C8BF5; transition: width 0.3s; border-radius: 7px; }
 .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-.param-row  { font-family: system-ui, sans-serif; font-size: 0.85em; display: flex; justify-content: space-between; background: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #eee; }
-.param-name { color: #555; }
-.param-mean { font-weight: bold; color: #333; }
+.param-row  { font-family: system-ui, sans-serif; font-size: 0.85em; display: flex; justify-content: space-between; background: #2a2a2a; padding: 5px 10px; border-radius: 4px; border: 1px solid #3a3a3a; }
+.param-name { color: #888; }
+.param-mean { font-weight: bold; color: #ddd; }
 </style>
 </head>
 <body>
@@ -193,13 +193,13 @@ canvas { display: block; width: 100%; border-radius: 3px; }
 </p>
 
 <table style="width:100%; border-collapse:collapse; font-family:system-ui,sans-serif; font-size:0.9em; margin: 0.8em 0;">
-  <tr style="background:#f0f0f0;">
+  <tr style="background:#2a2a2a;">
     <th style="padding:8px 12px; text-align:left;">Drink</th>
     <th style="padding:8px 12px; text-align:left;">Multiplier α</th>
     <th style="padding:8px 12px; text-align:left;">Reason</th>
   </tr>
   <tr><td style="padding:6px 12px;">💧 Water</td><td style="padding:6px 12px;">1.0×</td><td style="padding:6px 12px;">Baseline</td></tr>
-  <tr style="background:#fffaf0;"><td style="padding:6px 12px;">☕ Coffee</td><td style="padding:6px 12px;">1.5×</td><td style="padding:6px 12px;">Caffeine is a diuretic</td></tr>
+  <tr style="background:#252520;"><td style="padding:6px 12px;">☕ Coffee</td><td style="padding:6px 12px;">1.5×</td><td style="padding:6px 12px;">Caffeine is a diuretic</td></tr>
   <tr><td style="padding:6px 12px;">🍵 Tea</td><td style="padding:6px 12px;">1.2×</td><td style="padding:6px 12px;">Mild caffeine content</td></tr>
 </table>
 
@@ -304,8 +304,8 @@ canvas { display: block; width: 100%; border-radius: 3px; }
       <span class="val" id="surv_horizon_val">30</span>
     </div>
     <div class="control-group" style="margin-left:auto;">
-      <span style="font-family:system-ui,sans-serif; font-size:0.9em; color:#555;">P(urge): </span>
-      <span id="surv_prob" style="font-family:system-ui,sans-serif; font-size:1.2em; font-weight:bold; color:#D0021B;">—</span>
+      <span style="font-family:system-ui,sans-serif; font-size:0.9em; color:#888;">P(urge): </span>
+      <span id="surv_prob" style="font-family:system-ui,sans-serif; font-size:1.2em; font-weight:bold; color:#E8403A;">—</span>
     </div>
   </div>
   <canvas id="survivalCanvas" height="220"></canvas>
@@ -479,9 +479,11 @@ function setupCanvas(id) {
   c.style.width = w + 'px'; c.style.height = h + 'px';
   const ctx = c.getContext('2d');
   ctx.scale(d, d);
+  ctx.fillStyle = '#1e1e1e';
+  ctx.fillRect(0, 0, w, h);
   return {ctx, w, h};
 }
-const COLORS = {water:'#4C8BF5', coffee:'#F5A623', tea:'#7ED321', hazard:'#D0021B', particle:'#9B59B6', grid:'#e8e8e8', axis:'#888', text:'#333'};
+const COLORS = {water:'#4C8BF5', coffee:'#F5A623', tea:'#7ED321', hazard:'#E8403A', particle:'#9B59B6', grid:'#2e2e2e', axis:'#666', text:'#ccc'};
 
 function drawAxes(ctx, x0, y0, w, h, xLabel, yLabel, xTicks, yTicks, xFormat, yFormat) {
   ctx.strokeStyle = COLORS.axis; ctx.lineWidth = 1;
@@ -503,7 +505,7 @@ function drawAxes(ctx, x0, y0, w, h, xLabel, yLabel, xTicks, yTicks, xFormat, yF
     ctx.beginPath(); ctx.moveTo(x0, py); ctx.lineTo(x0 + w, py); ctx.stroke();
     ctx.setLineDash([]); ctx.strokeStyle = COLORS.axis; ctx.lineWidth = 1;
   }
-  ctx.fillStyle = '#555'; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#aaa'; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'center';
   ctx.fillText(xLabel, x0 + w/2, y0 + 28);
   ctx.save(); ctx.translate(x0 - 42, y0 - h/2); ctx.rotate(-Math.PI/2);
   ctx.fillText(yLabel, 0, 0); ctx.restore();
@@ -574,7 +576,7 @@ function drawKernel() {
   const peakIdx = pts.indexOf(Math.max(...pts));
   ctx.fillStyle = COLORS.water;
   ctx.beginPath(); ctx.arc(px(peakIdx), py(pts[peakIdx]), 5, 0, 2*Math.PI); ctx.fill();
-  ctx.fillStyle = '#444'; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#bbb'; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
   ctx.fillText(`peak @ τ=${peakIdx}`, px(peakIdx) + 7, py(pts[peakIdx]) - 4);
 
   // legend
@@ -592,7 +594,7 @@ function drawKernel() {
 
   // phase annotations: "absorption rise" and "excretion decay"
   const peakT = peakIdx;
-  ctx.font = '10px system-ui'; ctx.fillStyle = '#999'; ctx.textAlign = 'center';
+  ctx.font = '10px system-ui'; ctx.fillStyle = '#777'; ctx.textAlign = 'center';
   if (peakT > 10 && peakT < 250) {
     ctx.fillText('← absorption rise', px(peakT * 0.45), py(pts[Math.round(peakT*0.45)]) - 10);
     ctx.fillText('excretion decay →', px(peakT * 1.7 < 290 ? peakT * 1.7 : 270), py(pts[Math.round(Math.min(peakT*1.7, 290))]) - 10);
@@ -690,19 +692,19 @@ function drawLoad() {
   }
 
   // total curve
-  ctx.strokeStyle = '#222'; ctx.lineWidth = 2.5;
+  ctx.strokeStyle = '#ddd'; ctx.lineWidth = 2.5;
   ctx.beginPath();
   for (let i = 0; i < N; i++) ctx[i ? 'lineTo' : 'moveTo'](px(times[i]), py(total[i]));
   ctx.stroke();
 
   // cursor
   const cx = px(drinkCursor);
-  ctx.strokeStyle = '#999'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
   ctx.beginPath(); ctx.moveTo(cx, y0); ctx.lineTo(cx, y0 - ch); ctx.stroke(); ctx.setLineDash([]);
   const bNow = total[Math.round(Math.max(0, Math.min(drinkCursor, 300)))];
-  ctx.fillStyle = '#222'; ctx.font = 'bold 12px system-ui'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#ddd'; ctx.font = 'bold 12px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(`B(${Math.round(drinkCursor)}) = ${bNow.toFixed(0)} ml`, cx, y0 - ch - 6);
-  ctx.fillStyle = '#444';
+  ctx.fillStyle = '#bbb';
   ctx.beginPath(); ctx.arc(cx, py(bNow), 5, 0, 2*Math.PI); ctx.fill();
 
   // drink markers
@@ -797,12 +799,12 @@ function drawHazard() {
 
   // current B dot
   const lNow = lambda0 * sigmoid(beta * (bNow - theta));
-  ctx.fillStyle = '#D0021B';
+  ctx.fillStyle = '#E8403A';
   ctx.beginPath(); ctx.arc(pxL(bNow), pyL(lNow), 6, 0, 2*Math.PI); ctx.fill();
   // theta line
-  ctx.strokeStyle = '#aaa'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
   ctx.beginPath(); ctx.moveTo(pxL(theta), y0L); ctx.lineTo(pxL(theta), y0L - ch); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle = '#aaa'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#777'; ctx.font = '10px system-ui'; ctx.textAlign = 'center';
   ctx.fillText('θ', pxL(theta), y0L - ch - 4);
 
   // --- RIGHT: hazard over time ---
@@ -823,7 +825,7 @@ function drawHazard() {
 
   // cursor
   const cxR = px(drinkCursor);
-  ctx.strokeStyle = '#999'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
   ctx.beginPath(); ctx.moveTo(cxR, y0R); ctx.lineTo(cxR, y0R - ch); ctx.stroke(); ctx.setLineDash([]);
   const hzNow = hzT[Math.round(Math.max(0, Math.min(drinkCursor, 300)))];
   ctx.fillStyle = COLORS.hazard;
@@ -872,7 +874,7 @@ function drawSurvival() {
   const t1 = Math.min(t0 + horizon, 300);
 
   // shaded area
-  ctx.fillStyle = 'rgba(208,2,27,0.12)';
+  ctx.fillStyle = 'rgba(232,64,58,0.18)';
   ctx.beginPath();
   ctx.moveTo(px(t0), y0);
   for (let t = Math.round(t0); t <= Math.round(t1); t++) ctx.lineTo(px(t), pyR(hzT[t]));
@@ -885,11 +887,11 @@ function drawSurvival() {
   ctx.stroke();
 
   // horizon bracket
-  ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
+  ctx.strokeStyle = '#666'; ctx.lineWidth = 1; ctx.setLineDash([4,3]);
   ctx.beginPath(); ctx.moveTo(px(t0), y0); ctx.lineTo(px(t0), y0 - ch); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(px(t1), y0); ctx.lineTo(px(t1), y0 - ch); ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle = '#555'; ctx.font = '11px system-ui'; ctx.textAlign = 'center';
+  ctx.fillStyle = '#aaa'; ctx.font = '11px system-ui'; ctx.textAlign = 'center';
   ctx.fillText(`h = ${horizon} min`, px((t0+t1)/2), y0 - ch - 4);
 
   // compute survival
@@ -1019,7 +1021,7 @@ function pfDraw() {
   }
 
   // ESS threshold line annotation
-  ctx.fillStyle = '#aaa'; ctx.font = '11px system-ui'; ctx.textAlign = 'right';
+  ctx.fillStyle = '#777'; ctx.font = '11px system-ui'; ctx.textAlign = 'right';
   ctx.fillText(`ESS = ${ess.toFixed(1)} (threshold: ${(n*0.5).toFixed(0)})`, x0 + cw, pad.t - 4);
 }
 
@@ -1234,7 +1236,7 @@ function drawDemoCanvas() {
       ctx.fillStyle = drinkColor(ev.kind);
       ctx.beginPath(); ctx.arc(cx, y0 + 6, 5, 0, 2*Math.PI); ctx.fill();
     } else if (ev.type === 'urge') {
-      ctx.strokeStyle = '#D0021B'; ctx.lineWidth = 2; ctx.setLineDash([3,2]);
+      ctx.strokeStyle = '#E8403A'; ctx.lineWidth = 2; ctx.setLineDash([3,2]);
       ctx.beginPath(); ctx.moveTo(cx, y0); ctx.lineTo(cx, y0 - ch); ctx.stroke(); ctx.setLineDash([]);
     } else {
       ctx.strokeStyle = '#9B59B6'; ctx.lineWidth = 2; ctx.setLineDash([3,2]);
@@ -1242,9 +1244,9 @@ function drawDemoCanvas() {
     }
   }
   // now line
-  ctx.strokeStyle = '#333'; ctx.lineWidth = 1.5;
+  ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(px3(demoTime), y0); ctx.lineTo(px3(demoTime), y0 - ch); ctx.stroke();
-  ctx.fillStyle = '#333'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left';
+  ctx.fillStyle = '#ccc'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'left';
   ctx.fillText('now', px3(demoTime) + 4, y0 - ch + 12);
 }
 </script>
