@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pee Value: A Bayesian Bladder Model</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -61,11 +65,11 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   padding: 12px 18px;
   margin: 1em 0;
   border-radius: 0 4px 4px 0;
-  font-family: 'Courier New', monospace;
-  font-size: 0.95em;
+  font-size: 1em;
   overflow-x: auto;
+  text-align: center;
 }
-.eq-inline { font-family: 'Courier New', monospace; background: #252530; padding: 1px 5px; border-radius: 3px; font-size: 0.93em; }
+.eq-inline { background: #252530; padding: 1px 6px; border-radius: 3px; font-size: 0.95em; white-space: nowrap; }
 .note { font-size: 0.9em; color: #888; font-style: italic; }
 .btn {
   display: inline-block; padding: 7px 16px; border-radius: 4px; border: none;
@@ -144,10 +148,10 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <strong>difference-of-exponentials kernel</strong>:
 </p>
 <div class="eq">
-  k(τ) = exp(−τ / τ<sub>excrete</sub>) − exp(−τ / τ<sub>absorb</sub>),&nbsp;&nbsp; τ &gt; 0
+  $$k(\tau) = \exp\!\left(-\frac{\tau}{\tau_{\text{excrete}}}\right) - \exp\!\left(-\frac{\tau}{\tau_{\text{absorb}}}\right), \qquad \tau > 0$$
 </div>
 <p>
-  Here <span class="eq-inline">τ</span> is the time elapsed since you drank.
+  Here <span class="eq-inline">$\tau$</span> is the time elapsed since you drank.
   The first term (slow decay) models excretion; the second (fast decay) models absorption.
   Their difference gives a curve that <em>rises</em> as fluid is absorbed and
   <em>falls</em> as it's excreted. Think of it as the "bladder loading" impulse response
@@ -169,8 +173,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="kernelCanvas" height="220"></canvas>
   <div class="figure-caption">
-    Absorption kernel k(τ) for a single drink. Dashed lines show the individual exponential components.
-    The peak — maximum bladder contribution — occurs near τ ≈ τ<sub>absorb</sub> · ln(τ<sub>excrete</sub>/τ<sub>absorb</sub>) / (1/τ<sub>absorb</sub> − 1/τ<sub>excrete</sub>).
+    Absorption kernel $k(\tau)$ for a single drink. Dashed lines show the individual exponential components.
+    The peak occurs near $\tau \approx \dfrac{\tau_{\text{absorb}} \cdot \ln(\tau_{\text{excrete}}/\tau_{\text{absorb}})}{1/\tau_{\text{absorb}} - 1/\tau_{\text{excrete}}}$.
   </div>
 </div>
 
@@ -179,15 +183,15 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 <!-- SECTION 2: BLADDER LOAD -->
 <h2>2. Bladder Load — Superposition</h2>
 <p>
-  The <strong>total bladder load</strong> at time <span class="eq-inline">t</span> is just the
+  The <strong>total bladder load</strong> at time <span class="eq-inline">$t$</span> is just the
   sum of all drink contributions:
 </p>
 <div class="eq">
-  B(t) = Σ<sub>i</sub> V<sub>i</sub> · α<sub>i</sub> · k(t − t<sub>i</sub>)
+  $$B(t) = \sum_i V_i \cdot \alpha_i \cdot k(t - t_i)$$
 </div>
 <p>
   Each drink contributes its own scaled kernel. The scaling factor
-  <span class="eq-inline">α<sub>i</sub></span> captures the <em>diuretic effect</em> of different
+  <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
   beverages: coffee contains caffeine, a diuretic, so it loads the bladder more than its volume
   alone would suggest; tea less so.
 </p>
@@ -206,7 +210,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 <p>
   Add some drinks below to see how their individual contributions (thin coloured curves) combine
   into the total bladder load (bold black curve). Drag the <strong>time cursor</strong> to read off
-  <span class="eq-inline">B(t)</span> at any moment.
+  <span class="eq-inline">$B(t)$</span> at any moment.
 </p>
 
 <div class="figure">
@@ -219,8 +223,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <div class="drink-timeline" id="drinkTimeline"></div>
   <canvas id="loadCanvas" height="240"></canvas>
   <div class="figure-caption">
-    Bladder load B(t) over 300 minutes. Each thin curve is one drink's kernel (scaled by volume and α).
-    The bold black curve is their sum. Drag the vertical cursor to read B at that time.
+    Bladder load $B(t)$ over 300 minutes. Each thin curve is one drink's kernel (scaled by volume and $\alpha$).
+    The bold white curve is their sum. Drag the vertical cursor to read $B$ at that time.
   </div>
 </div>
 
@@ -234,16 +238,16 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 </p>
 <p>
   The instantaneous <strong>hazard rate</strong> is modelled as a sigmoid function of bladder load.
-  Below some threshold <span class="eq-inline">θ</span> the bladder is comfortable and urges are rare;
+  Below some threshold <span class="eq-inline">$\theta$</span> the bladder is comfortable and urges are rare;
   above it they become increasingly likely. The steepness
-  <span class="eq-inline">β</span> controls how sharply the transition happens:
+  <span class="eq-inline">$\beta$</span> controls how sharply the transition happens:
 </p>
 <div class="eq">
-  λ(t) = λ<sub>0</sub> · σ( β · (B(t) − θ) )
+  $$\lambda(t) = \lambda_0 \cdot \sigma\!\bigl(\beta\,(B(t) - \theta)\bigr)$$
 </div>
 <p>
-  where <span class="eq-inline">σ(x) = 1/(1 + e<sup>−x</sup>)</span> is the logistic sigmoid and
-  <span class="eq-inline">λ<sub>0</sub></span> is the baseline urge rate (events per minute).
+  where <span class="eq-inline">$\sigma(x) = 1/(1+e^{-x})$</span> is the logistic sigmoid and
+  <span class="eq-inline">$\lambda_0$</span> is the baseline urge rate (events per minute).
 </p>
 
 <div class="figure">
@@ -266,8 +270,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="hazardCanvas" height="250"></canvas>
   <div class="figure-caption">
-    Left panel: sigmoid gate σ(β(B−θ)) as a function of bladder load. The dot marks B(t<sub>cursor</sub>).
-    Right panel: resulting hazard rate λ(t) over time, using the drinks from section 2.
+    Left panel: sigmoid gate $\sigma(\beta(B-\theta))$ as a function of bladder load $B$. The dot marks $B(t_{\text{cursor}})$.
+    Right panel: resulting hazard rate $\lambda(t)$ over time, using the drinks from section 2.
   </div>
 </div>
 
@@ -277,17 +281,17 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 <h2>4. Survival Probability — Silence Is Evidence</h2>
 <p>
   The model uses a <em>point-process</em> framework. Given a hazard rate
-  <span class="eq-inline">λ(t)</span>, the probability of <strong>no</strong> urge
-  occurring in a window <span class="eq-inline">[t, t+h]</span> is:
+  <span class="eq-inline">$\lambda(t)$</span>, the probability of <strong>no</strong> urge
+  occurring in a window <span class="eq-inline">$[t,\,t+h]$</span> is:
 </p>
 <div class="eq">
-  P(no urge in [t, t+h]) = exp( −∫<sub>t</sub><sup>t+h</sup> λ(s) ds )
+  $$P(\text{no urge in } [t,\,t{+}h]) = \exp\!\left(-\int_t^{t+h} \lambda(s)\,ds\right)$$
 </div>
 <p>
   This is the <em>survival function</em> of the process. Its complement gives the prediction:
 </p>
 <div class="eq">
-  P(urge in next h min) = 1 − exp( −∫<sub>t</sub><sup>t+h</sup> λ(s) ds )
+  $$P(\text{urge in next } h \text{ min}) = 1 - \exp\!\left(-\int_t^{t+h} \lambda(s)\,ds\right)$$
 </div>
 <p>
   The integral is approximated numerically using the midpoint rule with 50 steps.
@@ -310,7 +314,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="survivalCanvas" height="220"></canvas>
   <div class="figure-caption">
-    The shaded area under λ(t) is the integrated hazard. P(urge) = 1 − exp(−shaded area).
+    The shaded area under $\lambda(t)$ is the integrated hazard. $P(\text{urge}) = 1 - \exp(-\text{shaded area})$.
     The cursor position and horizon come from sections 2–3.
   </div>
 </div>
@@ -320,7 +324,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 <!-- SECTION 5: PARTICLE FILTER -->
 <h2>5. The Particle Filter — Many Hypotheses at Once</h2>
 <p>
-  We don't know the true values of <span class="eq-inline">λ<sub>0</sub>, β, θ, τ<sub>absorb</sub>, τ<sub>excrete</sub></span>
+  We don't know the true values of <span class="eq-inline">$\lambda_0, \beta, \theta, \tau_{\text{absorb}}, \tau_{\text{excrete}}$</span>
   for any individual. Instead of fitting a single set of parameters, we maintain
   <strong>N particles</strong> — each particle is one complete hypothesis about all parameters,
   carrying a <em>weight</em> that reflects how well it explains the observed data so far.
@@ -332,7 +336,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 <ol style="margin: 1em 0 1em 1.5em; line-height: 2;">
   <li><strong>Initialise</strong> — sample parameters from broad prior distributions (log-normal).</li>
   <li><strong>Reweight</strong> — multiply each particle's weight by the likelihood of observed data under its parameters.</li>
-  <li><strong>Resample</strong> — when the <em>effective sample size</em> ESS = 1/Σw<sub>i</sub>² falls below 50% of N, duplicate high-weight particles and discard low-weight ones (systematic resampling).</li>
+  <li><strong>Resample</strong> — when the <em>effective sample size</em> $\mathrm{ESS} = 1/\!\sum w_i^2$ falls below $50\%$ of $N$, duplicate high-weight particles and discard low-weight ones (systematic resampling).</li>
 </ol>
 
 <div class="figure">
@@ -348,8 +352,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="particleCanvas" height="300"></canvas>
   <div class="figure-caption">
-    Each dot is a particle: its x-position is θ (threshold), y is λ<sub>0</sub> (baseline rate).
-    Dot size encodes weight. Blue = water-like; red = high-hazard. Pressing "Apply silence"
+    Each dot is a particle: its $x$-position is $\theta$ (threshold), $y$ is $\lambda_0$ (baseline rate).
+    Dot size encodes weight. Blue = low hazard; red = high hazard. Pressing "Apply silence"
     shrinks particles that predicted high hazard. "Observe urge" boosts them. "Force resample"
     re-equalises weights.
   </div>
