@@ -474,7 +474,7 @@ function setupCanvas(id) {
   const c = document.getElementById(id);
   const d = dpr();
   const w = c.parentElement.clientWidth - 40;
-  const h = parseInt(c.getAttribute('height'));
+  const h = parseInt(c.dataset.logicalH = c.dataset.logicalH || c.getAttribute('height'));
   c.width = w * d; c.height = h * d;
   c.style.width = w + 'px'; c.style.height = h + 'px';
   const ctx = c.getContext('2d');
