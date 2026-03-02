@@ -339,6 +339,49 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <li><strong>Resample</strong> — when the <em>effective sample size</em> $\mathrm{ESS} = 1/\!\sum w_i^2$ falls below $50\%$ of $N$, duplicate high-weight particles and discard low-weight ones (systematic resampling).</li>
 </ol>
 
+<h3>Three kinds of observation</h3>
+<p>
+  The "Reweight" step looks different depending on what has just been observed.
+</p>
+
+<p>
+  <strong>Silence</strong> — a quiet interval $[t_a, t_b]$ in which no urge occurred.
+  The likelihood of silence under a Poisson process is exactly the survival probability,
+  so each particle's weight is multiplied by
+</p>
+<div class="eq">
+  $$w_i \;\leftarrow\; w_i \cdot \exp\!\left(-\int_{t_a}^{t_b} \lambda_i(s)\,ds\right)$$
+</div>
+<p>
+  Particles that predicted high $\lambda$ throughout the quiet period are penalised
+  because they implied urges were likely — yet none arrived.
+</p>
+
+<p>
+  <strong>Urge observation</strong> — the user reports an urge at time $t^*$.
+  In a Poisson process the probability of an event falling in an infinitesimal window
+  $[t^*, t^*+dt]$ is $\lambda_i(t^*)\,dt$, so the update is
+</p>
+<div class="eq">
+  $$w_i \;\leftarrow\; w_i \cdot \lambda_i(t^*)$$
+</div>
+<p>
+  Particles whose parameters predicted a high urge rate at that moment are rewarded;
+  particles that predicted a quiet bladder at the same instant are down-weighted.
+  (A resample follows if ESS drops below the 50 % threshold.)
+</p>
+
+<p>
+  <strong>Void</strong> — the user urinates.  Voiding is a <em>deterministic, voluntary
+  action</em> rather than a stochastic observation, so it carries no information about
+  the latent parameters $(\lambda_0, \beta, \theta, \tau)$.  The particle weights are
+  therefore left unchanged.  What does change is the <em>physiological state</em>: the
+  drink history is cleared, which drives the bladder-load signal $B(t)$ back to zero
+  and consequently resets the hazard $\lambda(t)$ to its baseline $\lambda_0$.  Future
+  silence and urge observations then accumulate evidence afresh from the emptied-bladder
+  baseline, informed by the posterior the filter has already built up.
+</p>
+
 <div class="figure">
   <div class="particle-controls">
     <button class="btn btn-neutral" onclick="pfInit()">Re-initialise (prior)</button>
