@@ -840,26 +840,20 @@ function drawKernel() {
   ctx.fillStyle = '#bbb'; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
   ctx.fillText(`peak @ τ=${peakIdx}`, px(peakIdx) + 7, pyExp(pts[peakIdx]) - 4);
 
-  // legend
-  ctx.font = '11px system-ui'; ctx.textAlign = 'left';
+  // legend — top right
+  const lx = x0 + cw; // right edge
+  ctx.font = '11px system-ui'; ctx.textAlign = 'right';
   ctx.setLineDash([6,4]); ctx.lineWidth = 1.5;
   ctx.strokeStyle = '#E8A020';
-  ctx.beginPath(); ctx.moveTo(x0+5, pad.t+10); ctx.lineTo(x0+28, pad.t+10); ctx.stroke();
-  ctx.fillStyle = '#E8A020'; ctx.fillText('exp(−τ/τ_absorb)', x0+32, pad.t+14);
+  ctx.beginPath(); ctx.moveTo(lx-120, pad.t+10); ctx.lineTo(lx-97, pad.t+10); ctx.stroke();
+  ctx.fillStyle = '#E8A020'; ctx.fillText('exp(−τ/τ_absorb)', lx, pad.t+14);
   ctx.strokeStyle = '#5BA8A0';
-  ctx.beginPath(); ctx.moveTo(x0+5, pad.t+24); ctx.lineTo(x0+28, pad.t+24); ctx.stroke();
-  ctx.fillStyle = '#5BA8A0'; ctx.fillText('exp(−τ/τ_excrete)', x0+32, pad.t+28);
+  ctx.beginPath(); ctx.moveTo(lx-120, pad.t+24); ctx.lineTo(lx-97, pad.t+24); ctx.stroke();
+  ctx.fillStyle = '#5BA8A0'; ctx.fillText('exp(−τ/τ_excrete)', lx, pad.t+28);
   ctx.setLineDash([]); ctx.strokeStyle = COLORS.water; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(x0+5, pad.t+38); ctx.lineTo(x0+28, pad.t+38); ctx.stroke();
-  ctx.fillStyle = COLORS.water; ctx.fillText('k(τ) = excrete − absorb', x0+32, pad.t+42);
+  ctx.beginPath(); ctx.moveTo(lx-120, pad.t+38); ctx.lineTo(lx-97, pad.t+38); ctx.stroke();
+  ctx.fillStyle = COLORS.water; ctx.fillText('k(τ) = excrete − absorb', lx, pad.t+42);
 
-  // phase annotations: "absorption rise" and "excretion decay"
-  const peakT = peakIdx;
-  ctx.font = '10px system-ui'; ctx.fillStyle = '#777'; ctx.textAlign = 'center';
-  if (peakT > 10 && peakT < 250) {
-    ctx.fillText('← absorption rise', px(peakT * 0.45), py(pts[Math.round(peakT*0.45)]) - 10);
-    ctx.fillText('excretion decay →', px(peakT * 1.7 < 290 ? peakT * 1.7 : 270), py(pts[Math.round(Math.min(peakT*1.7, 290))]) - 10);
-  }
 }
 
 document.getElementById('k_absorb').oninput = drawKernel;
