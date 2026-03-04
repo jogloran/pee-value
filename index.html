@@ -183,7 +183,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <strong>difference-of-exponentials kernel</strong>:
 </p>
 <div class="eq">
-  $$k(\tau) = \exp\!\left(-\frac{\tau}{\tau_{\text{excrete}}}\right) - \exp\!\left(-\frac{\tau}{\tau_{\text{absorb}}}\right), \qquad \tau > 0$$
+  $$\kappa(\tau) = \exp\!\left(-\frac{\tau}{\tau_{\text{excrete}}}\right) - \exp\!\left(-\frac{\tau}{\tau_{\text{absorb}}}\right), \qquad \tau > 0$$
 </div>
 <p>
   Here <span class="eq-inline">$\tau$</span> is the time elapsed since you drank.
@@ -207,7 +207,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="kernelCanvas" height="220"></canvas>
   <div class="figure-caption">
-    Absorption kernel $k(\tau)$ for a single drink. Dashed lines show the individual exponential components.
+    Absorption kernel $\kappa(\tau)$ for a single drink. Dashed lines show the individual exponential components.
     The peak occurs near $\tau \approx \dfrac{\tau_{\text{absorb}} \cdot \ln(\tau_{\text{excrete}}/\tau_{\text{absorb}})}{1/\tau_{\text{absorb}} - 1/\tau_{\text{excrete}}}$.
   </div>
 </div>
@@ -221,11 +221,11 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   sum of all drink contributions:
 </p>
 <div class="eq">
-  $$B(t) = \sum_i V_i \cdot \alpha_i \cdot k(t - t_i)$$
+  $$B(t) = \sum_i V_i \cdot \alpha_i \cdot \kappa(t - t_i)$$
 </div>
 <p>
-  Each drink contributes its own scaled kernel. The scaling factor
-  <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
+  Each drink $i$, consumed at time $t_i$ in volume $V_i$ ml, contributes its own scaled kernel.
+  The scaling factor <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
   beverages: coffee contains caffeine, a diuretic, so it loads the bladder more than its volume
   alone would suggest; tea less so. These multipliers are fixed presets, not learned from data.
   The kernel shape — governed by <span class="eq-inline">$\tau_{\text{absorb}}$</span> and
@@ -508,7 +508,7 @@ particles = sample $N$ hypotheses from prior
 
 <span class="cmt"># hazard rate for a particle at time $s$:</span>
 <span class="kw">def</span> <span class="fn">$\lambda$</span>(s, particle, history):
-    $B = \sum_i$ history$_i$.volume $\cdot$ $\alpha$(history$_i$.type) $\cdot$ $k(s - t_i,\; \tau_\text{absorb},\; \tau_\text{excrete})$
+    $B = \sum_i$ history$_i$.volume $\cdot$ $\alpha$(history$_i$.type) $\cdot$ $\kappa(s - t_i,\; \tau_\text{absorb},\; \tau_\text{excrete})$
     <span class="kw">return</span> $\lambda_0 \cdot \sigma\!\bigl(\beta\,(B - \theta)\bigr)$
 
 <span class="kw">for each</span> event <span class="kw">in</span> chronological order:
@@ -812,7 +812,7 @@ function drawKernel() {
     const v = i/nYT;
     return [v, pyExp(v)];
   });
-  drawAxes(ctx, x0, y0, cw, ch, 'τ (minutes)', 'k(τ)', xTicks, yTicks,
+  drawAxes(ctx, x0, y0, cw, ch, 'τ (minutes)', 'κ(τ)', xTicks, yTicks,
     null, v => v.toFixed(2));
 
   // dashed component curves
@@ -827,7 +827,7 @@ function drawKernel() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // main curve — k(τ) is always below the excrete component on this shared scale
+  // main curve — κ(τ) is always below the excrete component on this shared scale
   ctx.strokeStyle = COLORS.water; ctx.lineWidth = 2.5;
   ctx.beginPath();
   for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), pyExp(pts[i]));
@@ -852,7 +852,7 @@ function drawKernel() {
   ctx.fillStyle = '#5BA8A0'; ctx.fillText('exp(−τ/τ_excrete)', lx, pad.t+28);
   ctx.setLineDash([]); ctx.strokeStyle = COLORS.water; ctx.lineWidth = 2.5;
   ctx.beginPath(); ctx.moveTo(lx-120, pad.t+38); ctx.lineTo(lx-97, pad.t+38); ctx.stroke();
-  ctx.fillStyle = COLORS.water; ctx.fillText('k(τ) = excrete − absorb', lx, pad.t+42);
+  ctx.fillStyle = COLORS.water; ctx.fillText('κ(τ) = excrete − absorb', lx, pad.t+42);
 
 }
 
