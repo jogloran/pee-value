@@ -208,7 +208,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <canvas id="kernelCanvas" height="220"></canvas>
   <div class="figure-caption">
     Absorption kernel $\kappa(\tau)$ for a single drink. Dashed lines show the individual exponential components.
-    The peak occurs near $\tau \approx \dfrac{\tau_{\text{absorb}} \cdot \ln(\tau_{\text{excrete}}/\tau_{\text{absorb}})}{1/\tau_{\text{absorb}} - 1/\tau_{\text{excrete}}}$.
+    The peak occurs near $\tau \approx \dfrac{\ln(\tau_{\text{excrete}}/\tau_{\text{absorb}})}{1/\tau_{\text{absorb}} - 1/\tau_{\text{excrete}}}$.
   </div>
 </div>
 
@@ -337,7 +337,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 <div class="eq">
   $$P(\text{urge in next } h \text{ min}) = 1 - \exp\!\left(-\int_t^{t+h} \lambda(s)\,ds\right)$$
 </div>
-<details class="callout">
+<details class="callout" id="midpointCallout">
   <summary>How is the integral computed numerically?</summary>
   <div class="callout-body">
   <p>
@@ -788,29 +788,22 @@ function drawKernel() {
 
   // sample curve
   const pts = [], eptA = [], eptE = [];
-  let ymax = 0;
   for (let i = 0; i <= 300; i++) {
     const tau = i;
-    const k = kernel(tau, tauA, tauE);
-    pts.push(k);
+    pts.push(kernel(tau, tauA, tauE));
     eptA.push(tau > 0 ? Math.exp(-tau/tauA) : 1);
     eptE.push(tau > 0 ? Math.exp(-tau/tauE) : 1);
-    if (k > ymax) ymax = k;
   }
-  if (ymax < 0.001) ymax = 0.001;
 
   const px = tau => x0 + (tau / T) * cw;
-  const py = v => y0 - (v / ymax) * ch;
-
-  // all curves share the same 0→1 y-scale (natural exponential range)
-  const pyExp = v => y0 - v * ch; // maps 0..1 to full chart height
+  const py = v => y0 - v * ch; // maps 0..1 to full chart height
 
   // axes
   const xTicks = [0,60,120,180,240,300].map(v => [v, px(v)]);
   const nYT = 4;
   const yTicks = Array.from({length: nYT+1}, (_,i) => {
     const v = i/nYT;
-    return [v, pyExp(v)];
+    return [v, py(v)];
   });
   drawAxes(ctx, x0, y0, cw, ch, 'τ (minutes)', 'κ(τ)', xTicks, yTicks,
     null, v => v.toFixed(2));
@@ -819,26 +812,26 @@ function drawKernel() {
   ctx.setLineDash([6,4]); ctx.lineWidth = 1.5;
   ctx.strokeStyle = '#E8A020'; // absorb: orange-ish
   ctx.beginPath();
-  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), pyExp(eptA[i]));
+  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), py(eptA[i]));
   ctx.stroke();
   ctx.strokeStyle = '#5BA8A0'; // excrete: teal-ish
   ctx.beginPath();
-  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), pyExp(eptE[i]));
+  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), py(eptE[i]));
   ctx.stroke();
   ctx.setLineDash([]);
 
   // main curve — κ(τ) is always below the excrete component on this shared scale
   ctx.strokeStyle = COLORS.water; ctx.lineWidth = 2.5;
   ctx.beginPath();
-  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), pyExp(pts[i]));
+  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), py(pts[i]));
   ctx.stroke();
 
   // annotations
   const peakIdx = pts.indexOf(Math.max(...pts));
   ctx.fillStyle = COLORS.water;
-  ctx.beginPath(); ctx.arc(px(peakIdx), pyExp(pts[peakIdx]), 5, 0, 2*Math.PI); ctx.fill();
+  ctx.beginPath(); ctx.arc(px(peakIdx), py(pts[peakIdx]), 5, 0, 2*Math.PI); ctx.fill();
   ctx.fillStyle = '#bbb'; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
-  ctx.fillText(`peak @ τ=${peakIdx}`, px(peakIdx) + 7, pyExp(pts[peakIdx]) - 4);
+  ctx.fillText(`peak @ τ=${peakIdx}`, px(peakIdx) + 7, py(pts[peakIdx]) - 4);
 
   // legend — top right
   const lx = x0 + cw; // right edge
@@ -994,6 +987,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // init all
   drawKernel(); drawHazard(); drawSurvival(); drawESS(); drawResampleDemo(); pfInit(); demoReset();
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      drawKernel(); drawLoad(); drawHazard(); drawSurvival(); drawESS(); drawResampleDemo(); pfDraw(); drawDemoCanvas();
+      if (document.getElementById('midpointCallout').open) drawMidpoint();
+    }, 150);
+  });
 });
 
 // ============================================================
@@ -1058,7 +1060,7 @@ function drawMidpoint() {
   ctx.fillText(`approx = ${approx.toFixed(4)}   true = ${trueVal.toFixed(4)}   error = ${err.toFixed(2)}%`, x0 + 4, pad.t - 10);
 }
 document.getElementById('mp_n').oninput = drawMidpoint;
-document.querySelector('details.callout').addEventListener('toggle', function() {
+document.getElementById('midpointCallout').addEventListener('toggle', function() {
   if (this.open) drawMidpoint();
 });
 
