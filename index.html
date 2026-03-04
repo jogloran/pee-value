@@ -302,8 +302,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
     </div>
     <div class="control-group">
       <label>λ<sub>0</sub> (max rate)</label>
-      <input type="range" id="hz_lambda0" min="0.001" max="0.02" step="0.001" value="0.005">
-      <span class="val" id="hz_lambda0_val">0.0050</span>
+      <input type="range" id="hz_lambda0" min="0.005" max="0.2" step="0.005" value="0.05">
+      <span class="val" id="hz_lambda0_val">0.0500</span>
     </div>
   </div>
   <canvas id="hazardCanvas" height="250"></canvas>
@@ -422,7 +422,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
     <th style="padding:7px 12px; text-align:left;">Log-scale σ</th>
     <th style="padding:7px 12px; text-align:left;">Meaning</th>
   </tr>
-  <tr><td style="padding:5px 12px;">$\lambda_0$</td><td style="padding:5px 12px;">0.005 /min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Max urge rate ≈ 1 event per 200 min</td></tr>
+  <tr><td style="padding:5px 12px;">$\lambda_0$</td><td style="padding:5px 12px;">0.05 /min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Max urge rate ≈ 1 event per 20 min</td></tr>
   <tr style="background:#252520;"><td style="padding:5px 12px;">$\beta$</td><td style="padding:5px 12px;">0.05</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Sigmoid steepness</td></tr>
   <tr><td style="padding:5px 12px;">$\theta$</td><td style="padding:5px 12px;">400 ml</td><td style="padding:5px 12px;">0.4</td><td style="padding:5px 12px;">Bladder threshold</td></tr>
   <tr style="background:#252520;"><td style="padding:5px 12px;">$\tau_{\text{absorb}}$</td><td style="padding:5px 12px;">20 min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Gut absorption timescale</td></tr>
@@ -551,17 +551,32 @@ particles = sample $N$ hypotheses from prior
   any parameter: $\theta$, $\lambda_0$, $\beta$, and so on.
 </p>
 <p>
-  Weights can collapse over time — a particle whose predictions keep being wrong gets
-  multiplied by small numbers until it is effectively zero. It is still in the array but
-  contributes nothing. The <strong>effective sample size</strong>
-  $\mathrm{ESS} = 1/\!\sum_i w_i^2$ measures how bad this is: equal weights gives
-  $\mathrm{ESS} = N$; one particle holding all weight gives $\mathrm{ESS} = 1$.
-  When $\mathrm{ESS}$ falls below $N/2$, the filter resamples — duplicating heavy
-  particles and discarding light ones — so the population stays useful.
-  Systematically: draw one uniform random offset $u_0 \in [0, 1/N)$, then place $N$
-  evenly-spaced probe points $u_0, u_0+1/N, u_0+2/N, \ldots$ along the cumulative weight
-  axis and keep whichever particle each probe lands in:
+  Over time, bad particles accumulate wrong predictions and their weights shrink toward
+  zero. They still exist in the array — they just contribute nothing to the answer.
 </p>
+<p>
+  The <strong>effective sample size</strong> $\mathrm{ESS} = 1/\!\sum_i w_i^2$ measures
+  how many particles are actually doing useful work. With 500 equal-weight particles,
+  $\mathrm{ESS} = 500$. If one particle has grabbed nearly all the weight,
+  $\mathrm{ESS} \approx 1$ — you effectively have a single hypothesis.
+</p>
+<p>
+  When $\mathrm{ESS}$ falls below $N/2$, the filter <strong>resamples</strong>: it
+  discards the near-zero particles and duplicates the heavy ones, resetting all weights
+  to $1/N$. The population stays healthy. Drag the slider below to see this in action,
+  then hit Resample when it activates.
+</p>
+<p>
+  The resampling algorithm works like a weighted dartboard. Drag the slider to give
+  particles unequal weights — each block is one particle, wide if heavy, a sliver if
+  near zero. The white needles are evenly spaced; each picks the particle it lands on:
+</p>
+<div style="display:flex; align-items:center; gap:12px; font-family:system-ui,sans-serif; font-size:0.85em; color:#888; margin:0.6em 0;">
+  <label for="ess_conc2">Concentration</label>
+  <input type="range" id="ess_conc2" min="0" max="1" step="0.01" value="0" style="flex:1; accent-color:#4C8BF5;">
+  <span id="ess_conc2_val" style="color:#4C8BF5; font-weight:bold; min-width:36px;">0.00</span>
+</div>
+<canvas id="resampleDemoCanvas" height="72" style="display:block; width:100%; border-radius:4px; margin:0.4em 0 0.8em;"></canvas>
 <div class="pseudocode"><span class="kw">def</span> <span class="fn">resample</span>(particles):
     $u_0 \sim \text{Uniform}(0,\; 1/N)$
     cumulative = prefix-sum of weights     <span class="cmt"># cumulative[j] = $\sum_{i \le j} w_i$</span>
@@ -571,9 +586,8 @@ particles = sample $N$ hypotheses from prior
         <span class="fn">survivors.append</span>(copy of particles[$j$] with weight $1/N$)
     <span class="kw">return</span> survivors</div>
 <p>
-  The single shared offset $u_0$ means probe points are spread evenly rather than
-  clustered, so each particle gets its fair share of copies with less variance than
-  independent sampling would give.
+  The single shared $u_0$ spreads probes evenly, so heavy particles get exactly their
+  fair share of copies — less variance than drawing each probe independently.
 </p>
 
 <div class="figure">
@@ -985,7 +999,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('touchend', () => { drinkDragging = false; });
 
   // init all
-  drawKernel(); drawHazard(); drawSurvival(); drawESS(); pfInit(); demoReset();
+  drawKernel(); drawHazard(); drawSurvival(); drawESS(); drawResampleDemo(); pfInit(); demoReset();
 });
 
 // ============================================================
@@ -1232,7 +1246,7 @@ let pfTime = 0;
 
 function pfSamplePrior() {
   return {
-    lambda0: lognormalSample(Math.log(0.005), 0.5),
+    lambda0: lognormalSample(Math.log(0.05), 0.5),
     beta:    lognormalSample(Math.log(0.05),  0.5),
     theta:   lognormalSample(Math.log(400),   0.4),
     tauA:    lognormalSample(Math.log(20),    0.5),
@@ -1265,7 +1279,8 @@ function pfSilence() {
   }
   pfTime += dt;
   pfNormalise();
-  pfDraw();
+  if (pfESS() < 0.5 * PF_N) pfResample();
+  else pfDraw();
 }
 
 function pfUrge() {
@@ -1274,7 +1289,8 @@ function pfUrge() {
     p.w *= Math.max(h, 1e-300);
   }
   pfNormalise();
-  pfResample();
+  if (pfESS() < 0.5 * PF_N) pfResample();
+  else pfDraw();
 }
 
 function pfResample() {
@@ -1309,12 +1325,12 @@ function pfDraw() {
 
   // theta range: 100-800, lambda0 range: 0.001-0.03
   const thetaMin = 50, thetaMax = 900;
-  const l0Min = 0.0005, l0Max = 0.025;
+  const l0Min = 0.005, l0Max = 0.25;
   const px2 = theta => x0 + ((theta - thetaMin) / (thetaMax - thetaMin)) * cw;
   const py2 = l0 => y0 - ((l0 - l0Min) / (l0Max - l0Min)) * ch;
 
   const xTicks = [100,300,500,700,900].map(v => [v, px2(v)]);
-  const yTicks = [0.005, 0.01, 0.015, 0.02].map(v => [v, py2(v)]);
+  const yTicks = [0.05, 0.1, 0.15, 0.2].map(v => [v, py2(v)]);
   drawAxes(ctx, x0, y0, cw, ch, 'θ (threshold, ml)', 'λ₀ (baseline rate)', xTicks, yTicks, null, v => v.toFixed(3));
 
   // find max weight for sizing
@@ -1433,6 +1449,7 @@ function drawESS() {
 }
 
 function essDoResample() {
+  drawResampleDemo();
   // systematic resampling
   const n = ESS_N;
   const u0 = Math.random() / n;
@@ -1448,7 +1465,67 @@ function essDoResample() {
   drawESS();
 }
 
-document.getElementById('ess_conc').oninput = () => { essResampledFrom = null; drawESS(); };
+function drawResampleDemo() {
+  const v = document.getElementById('ess_conc').value;
+  document.getElementById('ess_conc2').value = v;
+  document.getElementById('ess_conc2_val').textContent = (+v).toFixed(2);
+  const c = document.getElementById('resampleDemoCanvas');
+  const d = dpr();
+  const w = c.parentElement.clientWidth - 40;
+  const h = 72;
+  c.width = w * d; c.height = h * d;
+  c.style.width = w + 'px'; c.style.height = h + 'px';
+  const ctx = c.getContext('2d');
+  ctx.scale(d, d);
+  ctx.fillStyle = '#1e1e1e'; ctx.fillRect(0, 0, w, h);
+
+  const ws = essCurrentWs;
+  const n = ws.length;
+  const pad = {l: 8, r: 8};
+  const cw = w - pad.l - pad.r;
+  const barY = 14, barH = 20;
+
+  // draw weight segments with 1px gaps
+  let x = pad.l;
+  const segX = [];
+  for (let i = 0; i < n; i++) {
+    const sw = Math.max(ws[i] * cw - 1, 0.5);
+    segX.push(x);
+    ctx.fillStyle = essParticleColor(ws[i]);
+    ctx.fillRect(x, barY, sw, barH);
+    x += sw + 1;
+  }
+  segX.push(pad.l + cw);
+
+  // needle positions: use u0=0 for illustration (shows even spacing clearly)
+  const u0 = 0;
+  const needleY1 = barY - 8, needleY2 = barY + barH + 6;
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+  for (let i = 0; i < n; i++) {
+    const nx = pad.l + (u0 + i / n) * cw;
+    ctx.beginPath(); ctx.moveTo(nx, needleY1); ctx.lineTo(nx, needleY2); ctx.stroke();
+    // small triangle at top
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.moveTo(nx - 4, needleY1 - 6); ctx.lineTo(nx + 4, needleY1 - 6); ctx.lineTo(nx, needleY1); ctx.fill();
+  }
+
+  // labels
+  ctx.fillStyle = '#555'; ctx.font = '10px system-ui,sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('particle weight', pad.l, h - 2);
+  ctx.textAlign = 'right';
+  ctx.fillText('evenly-spaced needles', w - pad.r, h - 2);
+}
+
+function essSync(val) {
+  document.getElementById('ess_conc').value = val;
+  document.getElementById('ess_conc2').value = val;
+  document.getElementById('ess_conc2_val').textContent = (+val).toFixed(2);
+  essResampledFrom = null;
+  drawESS();
+  drawResampleDemo();
+}
+document.getElementById('ess_conc').oninput  = function() { essSync(this.value); };
+document.getElementById('ess_conc2').oninput = function() { essSync(this.value); };
 
 // ============================================================
 // SECTION 6: FULL DEMO
