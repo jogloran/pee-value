@@ -183,13 +183,14 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <strong>difference-of-exponentials kernel</strong>:
 </p>
 <div class="eq">
-  $$\kappa(\tau) = \exp\!\left(-\frac{\tau}{\tau_{\text{excrete}}}\right) - \exp\!\left(-\frac{\tau}{\tau_{\text{absorb}}}\right), \qquad \tau > 0$$
+  $$\kappa(\tau) = \frac{\exp\!\left(-\dfrac{\tau}{\tau_{\text{excrete}}}\right) - \exp\!\left(-\dfrac{\tau}{\tau_{\text{absorb}}}\right)}{\tau_{\text{excrete}} - \tau_{\text{absorb}}}, \qquad \tau > 0$$
 </div>
 <p>
   Here <span class="eq-inline">$\tau$</span> is the time elapsed since you drank.
   The first term (slow decay) models excretion; the second (fast decay) models absorption.
   Their difference gives a curve that <em>rises</em> as fluid is absorbed and
-  <em>falls</em> as it's excreted.
+  <em>falls</em> as it's excreted. Think of it as the "bladder loading" impulse response
+  for a single drink.
 </p>
 
 <div class="figure">
@@ -207,8 +208,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="kernelCanvas" height="220"></canvas>
   <div class="figure-caption">
-    Absorption kernel $\kappa(\tau)$ for a single drink. Dashed lines show the individual exponential components.
-    The peak occurs near $\tau \approx \dfrac{\ln(\tau_{\text{excrete}}/\tau_{\text{absorb}})}{1/\tau_{\text{absorb}} - 1/\tau_{\text{excrete}}}$.
+    Absorption kernel $\kappa(\tau)$ for a single drink (normalised so $\int_0^\infty\kappa\,d\tau=1$). Dashed lines show the individual exponential components.
+    The peak occurs near $\tau \approx \dfrac{\tau_{\text{absorb}} \cdot \ln(\tau_{\text{excrete}}/\tau_{\text{absorb}})}{1/\tau_{\text{absorb}} - 1/\tau_{\text{excrete}}}$.
   </div>
 </div>
 
@@ -224,10 +225,16 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   $$B(t) = \sum_i V_i \cdot \alpha_i \cdot \kappa(t - t_i)$$
 </div>
 <p>
-  Each drink $i$, consumed at time $t_i$ in volume $V_i$ ml, contributes its own scaled kernel.
-  The scaling factor <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
+  Each drink contributes its own scaled kernel. The scaling factor
+  <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
   beverages: coffee contains caffeine, a diuretic, so it loads the bladder more than its volume
-  alone would suggest; tea less so. These multipliers are fixed presets, not learned from data.
+  alone would suggest; tea less so.
+  Because the kernel is normalised — <span class="eq-inline">$\int_0^\infty \kappa(\tau)\,d\tau = 1$</span>
+  — drink <span class="eq-inline">$i$</span> contributes exactly <span class="eq-inline">$V_i \cdot \alpha_i$</span>
+  ml-equivalents of total bladder load regardless of which particle's time constants
+  <span class="eq-inline">$\tau_{\text{absorb}}, \tau_{\text{excrete}}$</span> are in use.
+  The time constants control only the <em>temporal shape</em> of that contribution, not its magnitude.
+  These multipliers are fixed presets, not learned from data.
   The kernel shape — governed by <span class="eq-inline">$\tau_{\text{absorb}}$</span> and
   <span class="eq-inline">$\tau_{\text{excrete}}$</span> — <em>is</em> learned per person, along
   with the hazard parameters <span class="eq-inline">$\lambda_0, \beta, \theta$</span> introduced
@@ -285,7 +292,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 </div>
 <p>
   where <span class="eq-inline">$\sigma(x) = 1/(1+e^{-x})$</span> is the logistic sigmoid and
-  <span class="eq-inline">$\lambda_0$</span> is the maximum urge rate — the ceiling approached when the bladder is very full (events per minute).
+  <span class="eq-inline">$\lambda_0$</span> is the baseline urge rate (events per minute).
 </p>
 
 <div class="figure">
@@ -301,21 +308,15 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
       <span class="val" id="hz_theta_val">400</span>
     </div>
     <div class="control-group">
-      <label>λ<sub>0</sub> (max rate)</label>
-      <input type="range" id="hz_lambda0" min="0.005" max="0.2" step="0.005" value="0.05">
-      <span class="val" id="hz_lambda0_val">0.0500</span>
+      <label>λ<sub>0</sub> (baseline)</label>
+      <input type="range" id="hz_lambda0" min="0.001" max="0.02" step="0.001" value="0.005">
+      <span class="val" id="hz_lambda0_val">0.0050</span>
     </div>
   </div>
   <canvas id="hazardCanvas" height="250"></canvas>
   <div class="figure-caption">
     Left panel: sigmoid gate $\sigma(\beta(B-\theta))$ as a function of bladder load $B$. The dot marks $B(t_{\text{cursor}})$.
     Right panel: resulting hazard rate $\lambda(t)$ over time, using the drinks from section 2.
-    <br><br>
-    <strong>θ</strong> shifts the sigmoid left or right — it's the bladder load at which urges become likely,
-    so a higher θ means a larger-capacity bladder.
-    <strong>β</strong> controls how abruptly urgency kicks in: low β gives a gradual ramp, high β a sharp threshold.
-    <strong>λ₀</strong> is the overall rate ceiling — even a full bladder can only produce urges as fast as λ₀ allows,
-    so it sets how frequently urge events occur at worst.
   </div>
 </div>
 
@@ -422,7 +423,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
     <th style="padding:7px 12px; text-align:left;">Log-scale σ</th>
     <th style="padding:7px 12px; text-align:left;">Meaning</th>
   </tr>
-  <tr><td style="padding:5px 12px;">$\lambda_0$</td><td style="padding:5px 12px;">0.05 /min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Max urge rate ≈ 1 event per 20 min</td></tr>
+  <tr><td style="padding:5px 12px;">$\lambda_0$</td><td style="padding:5px 12px;">0.005 /min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Baseline urge rate</td></tr>
   <tr style="background:#252520;"><td style="padding:5px 12px;">$\beta$</td><td style="padding:5px 12px;">0.05</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Sigmoid steepness</td></tr>
   <tr><td style="padding:5px 12px;">$\theta$</td><td style="padding:5px 12px;">400 ml</td><td style="padding:5px 12px;">0.4</td><td style="padding:5px 12px;">Bladder threshold</td></tr>
   <tr style="background:#252520;"><td style="padding:5px 12px;">$\tau_{\text{absorb}}$</td><td style="padding:5px 12px;">20 min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Gut absorption timescale</td></tr>
@@ -448,8 +449,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="particleCanvas" height="300"></canvas>
   <div class="figure-caption">
-    $x$: $\theta$ (bladder threshold, ml). $y$: $\lambda_0$ (max urge rate, events/min).
-    Dot size = weight. Colour: blue = currently predicting low hazard, red = high.
+    Each dot is a particle: its $x$-position is $\theta$ (threshold), $y$ is $\lambda_0$ (baseline rate).
+    Dot size encodes weight. Blue = low hazard; red = high hazard.
   </div>
 </div>
 
@@ -477,27 +478,48 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   Press <strong>Re-initialise</strong> to start over from the prior.
 </p>
 
-<details class="callout">
-  <summary>Weight update equations</summary>
-  <div class="callout-body">
-  <p>
-    <strong>Silence</strong> over $[t_a, t_b]$: in a Poisson process, the probability of
-    zero arrivals is the $k=0$ term $e^{-\mu}\mu^0/0! = e^{-\mu}$, where
-    $\mu = \int_{t_a}^{t_b}\!\lambda_i(s)\,ds$ is the expected count. So:
-  </p>
-  <div class="eq">$$w_i \;\leftarrow\; w_i \cdot \exp\!\left(-\int_{t_a}^{t_b} \lambda_i(s)\,ds\right)$$</div>
-  <p>
-    <strong>Urge</strong> at $t^*$: the probability of an event in an infinitesimal window
-    $[t^*, t^*\!+dt]$ is $\lambda_i(t^*)\,dt$, giving:
-  </p>
-  <div class="eq">$$w_i \;\leftarrow\; w_i \cdot \lambda_i(t^*)$$</div>
-  <p>
-    <strong>Void</strong>: a voluntary act carries no information about the latent parameters,
-    so weights are unchanged. The drink history is cleared, resetting $B(t)$ to zero and
-    returning $\lambda(t)$ toward $\lambda_0 \cdot \sigma(-\beta\theta) \approx 0$.
-  </p>
-  </div>
-</details>
+<h3>Three kinds of observation</h3>
+<p>
+  The "Reweight" step looks different depending on what has just been observed.
+</p>
+
+<p>
+  <strong>Silence</strong> — a quiet interval $[t_a, t_b]$ in which no urge occurred.
+  The likelihood of silence under a Poisson process is exactly the survival probability,
+  so each particle's weight is multiplied by
+</p>
+<div class="eq">
+  $$w_i \;\leftarrow\; w_i \cdot \exp\!\left(-\int_{t_a}^{t_b} \lambda_i(s)\,ds\right)$$
+</div>
+<p>
+  Particles that predicted high $\lambda$ throughout the quiet period are penalised
+  because they implied urges were likely — yet none arrived.
+</p>
+
+<p>
+  <strong>Urge observation</strong> — the user reports an urge at time $t^*$.
+  In a Poisson process the probability of an event falling in an infinitesimal window
+  $[t^*, t^*+dt]$ is $\lambda_i(t^*)\,dt$, so the update is
+</p>
+<div class="eq">
+  $$w_i \;\leftarrow\; w_i \cdot \lambda_i(t^*)$$
+</div>
+<p>
+  Particles whose parameters predicted a high urge rate at that moment are rewarded;
+  particles that predicted a quiet bladder at the same instant are down-weighted.
+  (A resample follows if ESS drops below the 50 % threshold.)
+</p>
+
+<p>
+  <strong>Void</strong> — the user urinates.  Voiding is a <em>deterministic, voluntary
+  action</em> rather than a stochastic observation, so it carries no information about
+  the latent parameters $(\lambda_0, \beta, \theta, \tau)$.  The particle weights are
+  therefore left unchanged.  What does change is the <em>physiological state</em>: the
+  drink history is cleared, which drives the bladder-load signal $B(t)$ back to zero
+  and consequently resets the hazard $\lambda(t)$ to its baseline $\lambda_0$.  Future
+  silence and urge observations then accumulate evidence afresh from the emptied-bladder
+  baseline, informed by the posterior the filter has already built up.
+</p>
 
 <p>
   Despite the Bayesian framing, the implementation is remarkably mundane:
@@ -696,9 +718,13 @@ function lognormalSample(mlog, slog) {
   const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
   return Math.exp(mlog + slog * z);
 }
+// Normalised difference-of-exponentials kernel.
+// kappa(tau) = (exp(-tau/tauE) - exp(-tau/tauA)) / (tauE - tauA)
+// Integral from 0 to inf is 1, so each drink contributes exactly
+// volume * alpha ml-equivalents to bladder load regardless of time constants.
 function kernel(tau, tauA, tauE) {
   if (tau <= 0) return 0;
-  return Math.max(Math.exp(-tau / tauE) - Math.exp(-tau / tauA), 0);
+  return Math.max((Math.exp(-tau / tauE) - Math.exp(-tau / tauA)) / (tauE - tauA), 0);
 }
 function typeAlpha(kind) {
   return kind === 'coffee' ? 1.5 : kind === 'tea' ? 1.2 : 1.0;
@@ -788,39 +814,45 @@ function drawKernel() {
 
   // sample curve
   const pts = [], eptA = [], eptE = [];
+  let ymax = 0;
   for (let i = 0; i <= 300; i++) {
     const tau = i;
-    pts.push(kernel(tau, tauA, tauE));
+    const k = kernel(tau, tauA, tauE);
+    pts.push(k);
     eptA.push(tau > 0 ? Math.exp(-tau/tauA) : 1);
     eptE.push(tau > 0 ? Math.exp(-tau/tauE) : 1);
+    if (k > ymax) ymax = k;
   }
+  if (ymax < 0.001) ymax = 0.001;
 
   const px = tau => x0 + (tau / T) * cw;
-  const py = v => y0 - v * ch; // maps 0..1 to full chart height
+  const py = v => y0 - (v / ymax) * ch;
 
   // axes
   const xTicks = [0,60,120,180,240,300].map(v => [v, px(v)]);
   const nYT = 4;
   const yTicks = Array.from({length: nYT+1}, (_,i) => {
-    const v = i/nYT;
+    const v = (i/nYT)*ymax;
     return [v, py(v)];
   });
   drawAxes(ctx, x0, y0, cw, ch, 'τ (minutes)', 'κ(τ)', xTicks, yTicks,
-    null, v => v.toFixed(2));
+    null, v => v.toFixed(3));
 
-  // dashed component curves
+  // dashed component curves — shown on right-hand secondary scale (0→1)
+  // We plot them scaled to fill the same pixel range as ymax, for visual comparison
+  const pyExp = v => y0 - v * ch; // maps 0..1 to full chart height
   ctx.setLineDash([6,4]); ctx.lineWidth = 1.5;
   ctx.strokeStyle = '#E8A020'; // absorb: orange-ish
   ctx.beginPath();
-  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), py(eptA[i]));
+  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), pyExp(eptA[i]));
   ctx.stroke();
   ctx.strokeStyle = '#5BA8A0'; // excrete: teal-ish
   ctx.beginPath();
-  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), py(eptE[i]));
+  for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), pyExp(eptE[i]));
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // main curve — κ(τ) is always below the excrete component on this shared scale
+  // main curve
   ctx.strokeStyle = COLORS.water; ctx.lineWidth = 2.5;
   ctx.beginPath();
   for (let i = 0; i <= 300; i++) ctx[i ? 'lineTo' : 'moveTo'](px(i), py(pts[i]));
@@ -833,20 +865,26 @@ function drawKernel() {
   ctx.fillStyle = '#bbb'; ctx.font = '11px system-ui'; ctx.textAlign = 'left';
   ctx.fillText(`peak @ τ=${peakIdx}`, px(peakIdx) + 7, py(pts[peakIdx]) - 4);
 
-  // legend — top right
-  const lx = x0 + cw; // right edge
-  ctx.font = '11px system-ui'; ctx.textAlign = 'right';
+  // legend
+  ctx.font = '11px system-ui'; ctx.textAlign = 'left';
   ctx.setLineDash([6,4]); ctx.lineWidth = 1.5;
   ctx.strokeStyle = '#E8A020';
-  ctx.beginPath(); ctx.moveTo(lx-120, pad.t+10); ctx.lineTo(lx-97, pad.t+10); ctx.stroke();
-  ctx.fillStyle = '#E8A020'; ctx.fillText('exp(−τ/τ_absorb)', lx, pad.t+14);
+  ctx.beginPath(); ctx.moveTo(x0+5, pad.t+10); ctx.lineTo(x0+28, pad.t+10); ctx.stroke();
+  ctx.fillStyle = '#E8A020'; ctx.fillText('exp(−τ/τ_absorb)', x0+32, pad.t+14);
   ctx.strokeStyle = '#5BA8A0';
-  ctx.beginPath(); ctx.moveTo(lx-120, pad.t+24); ctx.lineTo(lx-97, pad.t+24); ctx.stroke();
-  ctx.fillStyle = '#5BA8A0'; ctx.fillText('exp(−τ/τ_excrete)', lx, pad.t+28);
+  ctx.beginPath(); ctx.moveTo(x0+5, pad.t+24); ctx.lineTo(x0+28, pad.t+24); ctx.stroke();
+  ctx.fillStyle = '#5BA8A0'; ctx.fillText('exp(−τ/τ_excrete)', x0+32, pad.t+28);
   ctx.setLineDash([]); ctx.strokeStyle = COLORS.water; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(lx-120, pad.t+38); ctx.lineTo(lx-97, pad.t+38); ctx.stroke();
-  ctx.fillStyle = COLORS.water; ctx.fillText('κ(τ) = excrete − absorb', lx, pad.t+42);
+  ctx.beginPath(); ctx.moveTo(x0+5, pad.t+38); ctx.lineTo(x0+28, pad.t+38); ctx.stroke();
+  ctx.fillStyle = COLORS.water; ctx.fillText('κ(τ) = (excrete − absorb) / (τE − τA)', x0+32, pad.t+42);
 
+  // phase annotations: "absorption rise" and "excretion decay"
+  const peakT = peakIdx;
+  ctx.font = '10px system-ui'; ctx.fillStyle = '#777'; ctx.textAlign = 'center';
+  if (peakT > 10 && peakT < 250) {
+    ctx.fillText('← absorption rise', px(peakT * 0.45), py(pts[Math.round(peakT*0.45)]) - 10);
+    ctx.fillText('excretion decay →', px(peakT * 1.7 < 290 ? peakT * 1.7 : 270), py(pts[Math.round(Math.min(peakT*1.7, 290))]) - 10);
+  }
 }
 
 document.getElementById('k_absorb').oninput = drawKernel;
@@ -1242,7 +1280,7 @@ let pfTime = 0;
 
 function pfSamplePrior() {
   return {
-    lambda0: lognormalSample(Math.log(0.05), 0.5),
+    lambda0: lognormalSample(Math.log(0.005), 0.5),
     beta:    lognormalSample(Math.log(0.05),  0.5),
     theta:   lognormalSample(Math.log(400),   0.4),
     tauA:    lognormalSample(Math.log(20),    0.5),
@@ -1275,8 +1313,7 @@ function pfSilence() {
   }
   pfTime += dt;
   pfNormalise();
-  if (pfESS() < 0.5 * PF_N) pfResample();
-  else pfDraw();
+  pfDraw();
 }
 
 function pfUrge() {
@@ -1285,8 +1322,7 @@ function pfUrge() {
     p.w *= Math.max(h, 1e-300);
   }
   pfNormalise();
-  if (pfESS() < 0.5 * PF_N) pfResample();
-  else pfDraw();
+  pfResample();
 }
 
 function pfResample() {
@@ -1321,12 +1357,12 @@ function pfDraw() {
 
   // theta range: 100-800, lambda0 range: 0.001-0.03
   const thetaMin = 50, thetaMax = 900;
-  const l0Min = 0.005, l0Max = 0.25;
+  const l0Min = 0.0005, l0Max = 0.025;
   const px2 = theta => x0 + ((theta - thetaMin) / (thetaMax - thetaMin)) * cw;
   const py2 = l0 => y0 - ((l0 - l0Min) / (l0Max - l0Min)) * ch;
 
   const xTicks = [100,300,500,700,900].map(v => [v, px2(v)]);
-  const yTicks = [0.05, 0.1, 0.15, 0.2].map(v => [v, py2(v)]);
+  const yTicks = [0.005, 0.01, 0.015, 0.02].map(v => [v, py2(v)]);
   drawAxes(ctx, x0, y0, cw, ch, 'θ (threshold, ml)', 'λ₀ (baseline rate)', xTicks, yTicks, null, v => v.toFixed(3));
 
   // find max weight for sizing
@@ -1534,7 +1570,7 @@ let demoTime = 0;
 
 function demoSamplePrior() {
   return {
-    lambda0:    lognormalSample(Math.log(0.05), 0.5),
+    lambda0:    lognormalSample(Math.log(0.005), 0.5),
     beta:       lognormalSample(Math.log(0.05),  0.5),
     theta:      lognormalSample(Math.log(400),   0.4),
     tauA:       lognormalSample(Math.log(20),    0.5),
