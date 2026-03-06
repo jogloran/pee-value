@@ -101,15 +101,22 @@ def sample_from_prior() -> Params:
 
 def absorption_kernel(tau: float, p: Params) -> float:
     """
-    Difference-of-exponentials kernel.
-    Rises over tau_absorb, then decays over tau_excrete.
+    Normalised difference-of-exponentials kernel:
+
+        phi(tau) = (exp(-tau/tau_excrete) - exp(-tau/tau_absorb))
+                   / (tau_excrete - tau_absorb)
+
+    The denominator ensures integral_0^inf phi(tau) dtau = 1, so the total
+    bladder contribution of drink i is exactly volume_i * alpha_i
+    ml-equivalents regardless of which particle's time constants are used.
+    The time constants control only the temporal shape of the response.
     Returns 0 for tau <= 0.
     """
     if tau <= 0.0:
         return 0.0
     excrete = math.exp(-tau / p.tau_excrete)
     absorb  = math.exp(-tau / p.tau_absorb)
-    return max(excrete - absorb, 0.0)
+    return max((excrete - absorb) / (p.tau_excrete - p.tau_absorb), 0.0)
 
 
 def type_scaling(kind: DrinkKind, p: Params) -> float:
@@ -120,7 +127,14 @@ def type_scaling(kind: DrinkKind, p: Params) -> float:
 
 
 def bladder_load(t: float, drink_history: List[DrinkEvent], p: Params) -> float:
-    """Effective bladder load at time t given drink history."""
+    """
+    Effective bladder load at time t in ml-equivalents.
+
+    Each drink contributes volume_i * alpha_i ml-equivalents in total
+    (integrated over all time), distributed in time by the normalised kernel.
+    ml-equivalents are model-internal units expressing diuretic load relative
+    to water; they are not physical ml of urine.
+    """
     total = 0.0
     for drink in drink_history:
         tau   = t - drink.time

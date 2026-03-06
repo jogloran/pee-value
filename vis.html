@@ -148,7 +148,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <strong>difference-of-exponentials kernel</strong>:
 </p>
 <div class="eq">
-  $$k(\tau) = \exp\!\left(-\frac{\tau}{\tau_{\text{excrete}}}\right) - \exp\!\left(-\frac{\tau}{\tau_{\text{absorb}}}\right), \qquad \tau > 0$$
+  $$\kappa(\tau) = \frac{\exp\!\left(-\dfrac{\tau}{\tau_{\text{excrete}}}\right) - \exp\!\left(-\dfrac{\tau}{\tau_{\text{absorb}}}\right)}{\tau_{\text{excrete}} - \tau_{\text{absorb}}}, \qquad \tau > 0$$
 </div>
 <p>
   Here <span class="eq-inline">$\tau$</span> is the time elapsed since you drank.
@@ -173,7 +173,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="kernelCanvas" height="220"></canvas>
   <div class="figure-caption">
-    Absorption kernel $k(\tau)$ for a single drink. Dashed lines show the individual exponential components.
+    Absorption kernel $\kappa(\tau)$ for a single drink (normalised so $\int_0^\infty\kappa\,d\tau=1$). Dashed lines show the individual exponential components.
     The peak occurs near $\tau \approx \dfrac{\tau_{\text{absorb}} \cdot \ln(\tau_{\text{excrete}}/\tau_{\text{absorb}})}{1/\tau_{\text{absorb}} - 1/\tau_{\text{excrete}}}$.
   </div>
 </div>
@@ -187,13 +187,18 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   sum of all drink contributions:
 </p>
 <div class="eq">
-  $$B(t) = \sum_i V_i \cdot \alpha_i \cdot k(t - t_i)$$
+  $$B(t) = \sum_i V_i \cdot \alpha_i \cdot \kappa(t - t_i)$$
 </div>
 <p>
   Each drink contributes its own scaled kernel. The scaling factor
   <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
   beverages: coffee contains caffeine, a diuretic, so it loads the bladder more than its volume
   alone would suggest; tea less so.
+  Because the kernel is normalised — <span class="eq-inline">$\int_0^\infty \kappa(\tau)\,d\tau = 1$</span>
+  — drink <span class="eq-inline">$i$</span> contributes exactly <span class="eq-inline">$V_i \cdot \alpha_i$</span>
+  ml-equivalents of total bladder load regardless of which particle's time constants
+  <span class="eq-inline">$\tau_{\text{absorb}}, \tau_{\text{excrete}}$</span> are in use.
+  The time constants control only the <em>temporal shape</em> of that contribution, not its magnitude.
 </p>
 
 <table style="width:100%; border-collapse:collapse; font-family:system-ui,sans-serif; font-size:0.9em; margin: 0.8em 0;">
@@ -483,9 +488,13 @@ function lognormalSample(mlog, slog) {
   const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
   return Math.exp(mlog + slog * z);
 }
+// Normalised difference-of-exponentials kernel.
+// kappa(tau) = (exp(-tau/tauE) - exp(-tau/tauA)) / (tauE - tauA)
+// Integral from 0 to inf is 1, so each drink contributes exactly
+// volume * alpha ml-equivalents to bladder load regardless of time constants.
 function kernel(tau, tauA, tauE) {
   if (tau <= 0) return 0;
-  return Math.max(Math.exp(-tau / tauE) - Math.exp(-tau / tauA), 0);
+  return Math.max((Math.exp(-tau / tauE) - Math.exp(-tau / tauA)) / (tauE - tauA), 0);
 }
 function typeAlpha(kind) {
   return kind === 'coffee' ? 1.5 : kind === 'tea' ? 1.2 : 1.0;
@@ -596,7 +605,7 @@ function drawKernel() {
     const v = (i/nYT)*ymax;
     return [v, py(v)];
   });
-  drawAxes(ctx, x0, y0, cw, ch, 'τ (minutes)', 'k(τ)', xTicks, yTicks,
+  drawAxes(ctx, x0, y0, cw, ch, 'τ (minutes)', 'κ(τ)', xTicks, yTicks,
     null, v => v.toFixed(3));
 
   // dashed component curves — shown on right-hand secondary scale (0→1)
@@ -637,7 +646,7 @@ function drawKernel() {
   ctx.fillStyle = '#5BA8A0'; ctx.fillText('exp(−τ/τ_excrete)', x0+32, pad.t+28);
   ctx.setLineDash([]); ctx.strokeStyle = COLORS.water; ctx.lineWidth = 2.5;
   ctx.beginPath(); ctx.moveTo(x0+5, pad.t+38); ctx.lineTo(x0+28, pad.t+38); ctx.stroke();
-  ctx.fillStyle = COLORS.water; ctx.fillText('k(τ) = excrete − absorb', x0+32, pad.t+42);
+  ctx.fillStyle = COLORS.water; ctx.fillText('κ(τ) = (excrete − absorb) / (τE − τA)', x0+32, pad.t+42);
 
   // phase annotations: "absorption rise" and "excretion decay"
   const peakT = peakIdx;
