@@ -225,8 +225,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   $$B(t) = \sum_i V_i \cdot \alpha_i \cdot \kappa(t - t_i)$$
 </div>
 <p>
-  Each drink contributes its own scaled kernel. The scaling factor
-  <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
+  Each drink $i$, consumed at time $t_i$ in volume $V_i$ ml, contributes its own scaled kernel.
+  The scaling factor <span class="eq-inline">$\alpha_i$</span> captures the <em>diuretic effect</em> of different
   beverages: coffee contains caffeine, a diuretic, so it loads the bladder more than its volume
   alone would suggest; tea less so.
   Because the kernel is normalised — <span class="eq-inline">$\int_0^\infty \kappa(\tau)\,d\tau = 1$</span>
@@ -317,6 +317,12 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   <div class="figure-caption">
     Left panel: sigmoid gate $\sigma(\beta(B-\theta))$ as a function of bladder load $B$. The dot marks $B(t_{\text{cursor}})$.
     Right panel: resulting hazard rate $\lambda(t)$ over time, using the drinks from section 2.
+    <br><br>
+    <strong>θ</strong> shifts the sigmoid left or right — it's the bladder load at which urges become likely,
+    so a higher θ means a larger-capacity bladder.
+    <strong>β</strong> controls how abruptly urgency kicks in: low β gives a gradual ramp, high β a sharp threshold.
+    <strong>λ₀</strong> is the baseline urge rate — the hazard approaches λ₀·σ(·) asymptotically,
+    so it sets the overall scale of how frequently urge events occur.
   </div>
 </div>
 
@@ -372,6 +378,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
 </details>
 
 <p>
+  The integral is approximated numerically using the midpoint rule with 50 steps.
   A crucial insight: even the <em>absence</em> of observed urges during a quiet interval
   is informative — it penalises particles (parameter hypotheses) that predicted high hazard
   during that interval.
@@ -423,7 +430,7 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
     <th style="padding:7px 12px; text-align:left;">Log-scale σ</th>
     <th style="padding:7px 12px; text-align:left;">Meaning</th>
   </tr>
-  <tr><td style="padding:5px 12px;">$\lambda_0$</td><td style="padding:5px 12px;">0.005 /min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Baseline urge rate</td></tr>
+  <tr><td style="padding:5px 12px;">$\lambda_0$</td><td style="padding:5px 12px;">0.005 /min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Baseline urge rate ≈ 1 event per 200 min</td></tr>
   <tr style="background:#252520;"><td style="padding:5px 12px;">$\beta$</td><td style="padding:5px 12px;">0.05</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Sigmoid steepness</td></tr>
   <tr><td style="padding:5px 12px;">$\theta$</td><td style="padding:5px 12px;">400 ml</td><td style="padding:5px 12px;">0.4</td><td style="padding:5px 12px;">Bladder threshold</td></tr>
   <tr style="background:#252520;"><td style="padding:5px 12px;">$\tau_{\text{absorb}}$</td><td style="padding:5px 12px;">20 min</td><td style="padding:5px 12px;">0.5</td><td style="padding:5px 12px;">Gut absorption timescale</td></tr>
@@ -449,8 +456,8 @@ canvas { display: block; width: 100%; border-radius: 3px; background: #1e1e1e; }
   </div>
   <canvas id="particleCanvas" height="300"></canvas>
   <div class="figure-caption">
-    Each dot is a particle: its $x$-position is $\theta$ (threshold), $y$ is $\lambda_0$ (baseline rate).
-    Dot size encodes weight. Blue = low hazard; red = high hazard.
+    $x$: $\theta$ (bladder threshold, ml). $y$: $\lambda_0$ (baseline urge rate, events/min).
+    Dot size = weight. Colour: blue = currently predicting low hazard, red = high.
   </div>
 </div>
 
